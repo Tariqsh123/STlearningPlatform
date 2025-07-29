@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 
 export default function HeroSection() {
   return (
-    <section className="relative top-[-65px] w-full h-[400px] md:h-[650px] [@media(min-width:1800px)]:h-[850px] overflow-hidden font-sans z-10">
-      {/* Background Image with cinematic zoom */}
+    <section className="relative top-[-65px] bottom-[-65px] mb-[-80px] w-full h-[400px] md:h-[650px] [@media(min-width:1800px)]:h-[850px] overflow-hidden font-sans z-10">
+
+      {/* Background Image */}
       <motion.div
         initial={{ scale: 1 }}
         animate={{ scale: 1.08 }}
@@ -21,21 +22,21 @@ export default function HeroSection() {
         />
       </motion.div>
 
-      {/* Dark Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-black/20 z-10" />
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-white/10 via-black/60 to-black/20 z-10" />
 
       {/* Text Content */}
       <motion.div
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 1 }}
-        className="relative z-20 flex flex-col items-center justify-center text-center h-full px-4"
+        className="relative z-20 flex flex-col items-center justify-center text-center h-full px-4 pt-[50px] sm:pt-0"
       >
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 1 }}
-          className="text-white text-3xl sm:text-5xl md:text-6xl [@media(min-width:1800px)]:text-7xl font-extrabold drop-shadow-xl"
+          className="text-white text-2xl sm:text-5xl md:text-6xl [@media(min-width:1800px)]:text-7xl font-extrabold drop-shadow-xl"
         >
           Empowering Schools with AI
         </motion.h1>
@@ -44,7 +45,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 1 }}
-          className="text-white text-lg sm:text-xl md:text-2xl [@media(min-width:1800px)]:text-3xl mt-3 font-medium drop-shadow"
+          className="text-white text-base sm:text-xl md:text-2xl [@media(min-width:1800px)]:text-3xl mt-3 font-medium drop-shadow"
         >
           Smarter Learning. Simpler Management.
         </motion.h2>
@@ -58,7 +59,6 @@ export default function HeroSection() {
           An intelligent platform connecting administrators, teachers, and students for a seamless learning experience.
         </motion.p>
 
-        {/* Call to Action Button */}
         <motion.a
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

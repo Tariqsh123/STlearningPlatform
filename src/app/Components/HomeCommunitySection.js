@@ -27,7 +27,7 @@ const features = [
 
 export default function HomeCommunitySection() {
   return (
-    <section className="py-16 px-4 bg-[#F1F5F9]">
+    <section className="py-0 mt-12 px-4 bg-[#F1F5F9]">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
         {features.map((item, index) => (
           <div key={index} className="flex flex-col items-start gap-4">

@@ -21,11 +21,11 @@ export default function HomeAfterHeroSection() {
 
   return (
     <section className="bg-[#F1F5F9] py-12 px-4">
-      <div className="max-w-7xl mx-auto grid gap-10 md:grid-cols-3">
+      <div className="max-w-7xl mx-auto grid gap-5 md:grid-cols-3">
         {sections.map((item, index) => (
           <div
             key={index}
-            className="bg-white shadow-lg rounded-2xl p-5 border border-[#E2E8F0] hover:shadow-xl transition duration-300"
+            className="bg-white shadow-lg rounded-2xl p-10 border border-[#E2E8F0] hover:shadow-xl transition duration-300"
           >
             <h3 className="text-lg md:text-xl font-semibold text-[#0F172A] mb-3">
               {item.title}
