@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Menu, X, Plus, Trash2 } from 'lucide-react';
+import { Menu, X, Plus, Trash2, Pencil } from 'lucide-react';
 
 const menuItems = [
   { label: 'Schools' },
@@ -18,159 +18,160 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('Schools');
   const [modalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const openModal = () => setModalOpen(true);
-  const closeModal = () => {
-    setModalOpen(false);
-    setFormData({});
-  };
+  const [dataRows, setDataRows] = useState({
+    Schools: [],
+    Students: [],
+    Courses: [],
+    'Student Fees': [],
+    'School Payouts': [],
+  });
 
   const tableHeaders = {
-    Schools: ['ID', 'Name', 'Email', 'Phone', 'ID', 'Password', 'Total Students', 'Action'],
-    Students: ['ID', 'Name', 'Email', 'Phone', 'ID', 'Password', 'Action'],
-    Courses: ['ID', 'Course Name', 'Duration', 'Enrolled', 'Action'],
+    Schools: ['ID', 'School Name', 'Principal Name', 'Email', 'Phone', 'Log In ID', 'Password', 'Total Students', 'Commission', 'Action'],
+    Students: ['ID', 'Full Name', 'School Name', 'Email', 'Phone', 'Course Name', 'Duration', 'Remaining Months', 'Log In ID', 'Password', 'Action'],
+    Courses: ['ID', 'Course Name', 'Duration', 'Fees', 'Total Students', 'Action'],
+    'Student Fees': ['School Name', 'Student Name', 'Course', 'Duration', 'Fee', 'Status', 'Action'],
+    'School Payouts': ['School Name', 'Total Students', 'Phone', 'Payout', 'Status', 'Action'],
   };
 
-  const dummyRows = {
-    Schools: [['1', 'Sunrise School', 'sunrise@email.com', '0300-0000000', 'SCH123', 'pass123', '600'],['3', 'School', 'sunrise@email.com', '0300-0000000', 'SCH123', 'pass123', '500'],['2', 'Sunrise School', 'sunrise@email.com', '0300-0000000', 'SCH123', 'pass123', '500']],
-    Students: [['1', 'Ali Raza', 'ali@email.com', '0321-1111111', 'STU123', 'pass456']],
-    Courses: [['1', 'Web Dev', '3 Months', '200']],
+  const generateRandomPassword = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+';
+    return Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+  };
+
+  const openModal = (edit = false, index = null, row = null) => {
+    setIsEditing(edit);
+    setEditIndex(index);
+
+    const headers = tableHeaders[activeTab];
+    const initialForm = {};
+
+    headers.forEach((key, idx) => {
+      if (key !== 'Action') {
+        initialForm[key] = edit && row ? row[idx] : '';
+      }
+    });
+
+    if (!edit) {
+      if (headers.includes('ID')) initialForm['ID'] = (dataRows[activeTab].length + 1).toString();
+
+      if (headers.includes('Log In ID')) {
+        const prefix = activeTab === 'Schools' ? 'SCH' : activeTab === 'Students' ? 'STU' : 'USR';
+        initialForm['Log In ID'] = `${prefix}${Math.floor(100 + Math.random() * 900)}`;
+      }
+
+      if (headers.includes('Password')) initialForm['Password'] = generateRandomPassword();
+      if (headers.includes('Total Students')) initialForm['Total Students'] = '0';
+      if (headers.includes('Commission')) initialForm['Commission'] = '0';
+
+      if (activeTab === 'Students' && headers.includes('Remaining Months')) {
+        initialForm['Remaining Months'] = '0';
+      }
+    }
+
+    setFormData(initialForm);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsEditing(false);
+    setEditIndex(null);
+    setFormData({});
+    setModalOpen(false);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const updatedData = [...dataRows[activeTab]];
+
+    if (isEditing && editIndex !== null) {
+      updatedData[editIndex] = Object.values(formData);
+    } else {
+      updatedData.push(Object.values(formData));
+    }
+
+    setDataRows(prev => ({ ...prev, [activeTab]: updatedData }));
+    closeModal();
+  };
+
+  const handleDelete = (index) => {
+    const updated = dataRows[activeTab].filter((_, i) => i !== index);
+    setDataRows(prev => ({ ...prev, [activeTab]: updated }));
+  };
+
+  const getFilteredRows = () => {
+    const query = searchQuery.trim().toLowerCase();
+    const rows = dataRows[activeTab] || [];
+    return !query ? rows : rows.filter(row =>
+      row.some(cell => cell?.toString().toLowerCase().includes(query))
+    );
   };
 
   const renderFormFields = () => {
-    switch (activeTab) {
-      case 'Schools':
-        return (
-          <>
-            <input placeholder="School Name" className={inputClass} />
-            <input placeholder="Principal Name" className={inputClass} />
-            <input placeholder="Email" className={inputClass} />
-            <input placeholder="Phone" className={inputClass} />
-          </>
-        );
-      case 'Students':
-        return (
-          <>
-            <input placeholder="Full Name" className={inputClass} />
-            <input placeholder="Father Name" className={inputClass} />
-            <input placeholder="School Name" className={inputClass} />
-            <input placeholder="Email" className={inputClass} />
-            <input placeholder="Address" className={inputClass} />
-            <input placeholder="Phone" className={inputClass} />
-          </>
-        );
-      case 'Courses':
-        return (
-          <>
-            <input placeholder="Course Name" className={inputClass} />
-            <input placeholder="Month/Duration" className={inputClass} />
-            <input placeholder="About" className={inputClass} />
-           <input type="file" accept="image/*" className={inputClass} onChange={(e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      console.log('Selected file:', file); 
-    }
-  }}
-/>
-            <input placeholder="Icon (e.g., 📘)" className={inputClass} />
-          </>
-        );
-      default:
-        return null;
-    }
+    const hiddenFields = ['ID', 'Log In ID', 'Password', 'Total Students'];
+    const readOnlyFields = ['Remaining Months'];
+    const headers = tableHeaders[activeTab].filter(key => key !== 'Action');
+
+    return headers.map((key, idx) => {
+      if (hiddenFields.includes(key)) return null;
+
+      const readOnly = readOnlyFields.includes(key);
+      return (
+        <input
+          key={idx}
+          placeholder={key}
+          className={`${inputClass} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+          value={formData[key] || ''}
+          readOnly={readOnly}
+          onChange={(e) => {
+            if (!readOnly) {
+              setFormData(prev => ({ ...prev, [key]: e.target.value }));
+            }
+          }}
+        />
+      );
+    });
   };
 
-const getFilteredRows = () => {
-  const rows = dummyRows[activeTab] || [];
-  const query = searchQuery.trim().toLowerCase();
-  if (!query) return rows;
-
-  return rows.filter(row =>
-    row.some(cell =>
-      cell?.toString().toLowerCase().includes(query)
-    )
-  );
-};
-
-
   const renderTable = () => {
-    if (activeTab === 'Student Fees') {
-      return (
-        <div className="overflow-x-auto mt-6">
-          <table className="w-full table-auto border text-left text-sm text-[#0F172A]">
-            <thead className="bg-[#E2E8F0] text-[#0F172A]">
-              <tr>
-                <th className="px-4 py-2 border">School</th>
-                <th className="px-4 py-2 border">Student</th>
-                <th className="px-4 py-2 border">Course</th>
-                <th className="px-4 py-2 border">Duration</th>
-                <th className="px-4 py-2 border">Fee</th>
-                <th className="px-4 py-2 border">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="hover:bg-[#F1F5F9]">
-                <td className="px-4 py-2 border">Sunrise School</td>
-                <td className="px-4 py-2 border">Ali Raza</td>
-                <td className="px-4 py-2 border">Web Dev</td>
-                <td className="px-4 py-2 border">3 Months</td>
-                <td className="px-4 py-2 border">Rs. 15,000</td>
-                <td className="px-4 py-2 border text-green-600">Paid</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      );
-    }
-
-    if (activeTab === 'School Payouts') {
-      return (
-        <div className="overflow-x-auto mt-6">
-          <table className="w-full table-auto border text-left text-sm text-[#0F172A]">
-            <thead className="bg-[#E2E8F0] text-[#0F172A]">
-              <tr>
-                <th className="px-4 py-2 border">School</th>
-                <th className="px-4 py-2 border">Enroll</th>
-                <th className="px-4 py-2 border">Phone</th>
-                <th className="px-4 py-2 border">Payout</th>
-                <th className="px-4 py-2 border">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="hover:bg-[#F1F5F9]">
-                <td className="px-4 py-2 border">Sunrise School</td>
-                <td className="px-4 py-2 border">200</td>
-                <td className="px-4 py-2 border">0300-0000000</td>
-                <td className="px-4 py-2 border">Rs. 120,000</td>
-                <td className="px-4 py-2 border text-green-600">Paid</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      );
-    }
+    const headers = tableHeaders[activeTab] || [];
+    const rows = getFilteredRows();
 
     return (
       <div className="overflow-x-auto mt-6">
         <table className="w-full table-auto border text-left text-sm text-[#0F172A]">
           <thead className="bg-[#E2E8F0] text-[#0F172A]">
             <tr>
-              {tableHeaders[activeTab].map((header, idx) => (
+              {headers.map((header, idx) => (
                 <th key={idx} className="px-4 py-2 border">{header}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {getFilteredRows().map((row, rowIndex) => (
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={headers.length} className="px-4 py-4 text-center border text-gray-400 italic">
+                  No Data
+                </td>
+              </tr>
+            ) : rows.map((row, rowIndex) => (
               <tr key={rowIndex} className="hover:bg-[#F1F5F9]">
                 {row.map((cell, cellIndex) => (
                   <td key={cellIndex} className="px-4 py-2 border">{cell}</td>
                 ))}
-                <td className="px-4 py-2 border">
-                  <button className="text-red-600 hover:text-red-800">
+                <td className="px-4 py-2 border flex gap-2">
+                  <button className="text-red-600 hover:text-red-800" onClick={() => handleDelete(rowIndex)}>
                     <Trash2 className="w-5 h-5" />
                   </button>
+                  {activeTab !== 'Students' && (
+                    <button className="text-blue-600 hover:text-blue-800" onClick={() => openModal(true, rowIndex, row)}>
+                      <Pencil className="w-5 h-5" />
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
@@ -224,28 +225,27 @@ const getFilteredRows = () => {
 
         <div className="flex-1 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Manage all {activeTab.toLowerCase()} from here.</h2>
-            {!['Student Fees', 'School Payouts'].includes(activeTab) && (
+            <h2 className="text-xl font-semibold">
+              Manage all {activeTab.toLowerCase()} from here.
+            </h2>
+
+            {activeTab !== 'Students' && (
               <button
                 className="flex items-center gap-2 px-4 py-2 bg-[#0EA5E9] text-white rounded hover:bg-[#0284C7]"
-                onClick={openModal}
+                onClick={() => openModal()}
               >
-                <Plus className="w-4 h-4" /> Add {activeTab.slice(0, -1)}
+                <Plus className="w-4 h-4" /> Add {activeTab === 'School Payouts' ? 'Payout' : activeTab.slice(0, -1)}
               </button>
             )}
           </div>
 
-          {!['Student Fees', 'School Payouts'].includes(activeTab) && (
-            <div className="mb-4">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..."
-                className="px-4 py-2 border border-gray-300 rounded-md w-full"
-              />
-            </div>
-          )}
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search..."
+            className="mb-4 px-4 py-2 border border-gray-300 rounded-md w-full"
+          />
 
           {renderTable()}
         </div>
@@ -256,18 +256,20 @@ const getFilteredRows = () => {
         <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">Add {activeTab.slice(0, -1)}</h3>
+              <h3 className="text-xl font-semibold">
+                {isEditing ? `Edit ${activeTab.slice(0, -1)}` : `Add ${activeTab === 'School Payouts' ? 'Payout' : activeTab.slice(0, -1)}`}
+              </h3>
               <button onClick={closeModal}>
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleFormSubmit}>
               {renderFormFields()}
               <button
                 type="submit"
                 className="w-full bg-[#0EA5E9] text-white py-2 rounded hover:bg-[#0284C7]"
               >
-                Submit
+                {isEditing ? 'Update' : 'Submit'}
               </button>
             </form>
           </div>

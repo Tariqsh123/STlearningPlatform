@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../Components/Navbar";
@@ -11,8 +12,11 @@ export default function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (id === "admin" && password === "admin") {
       router.push("/admin");
+    } else if (id === "school" && password === "school") {
+      router.push("/school");
     } else {
       alert("Invalid ID or Password");
     }
