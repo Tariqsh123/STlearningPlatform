@@ -10,7 +10,19 @@ const menuItems = [
   { label: 'School Payouts' },
 ];
 
-const inputClass = `w-full px-4 py-2 border border-[#E2E8F0] rounded focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] transition`;
+const colors = {
+  primary: '#1E293B',
+  accent: '#0EA5E9',
+  background: '#F1F5F9',
+  container: '#FFFFFF',
+  border: '#E2E8F0',
+  text: '#0F172A',
+  textSecondary: '#64748B',
+  hover: '#0284C7',
+  error: '#DC2626',
+};
+
+const inputClass = `w-full px-4 py-2 border border-[${colors.border}] rounded focus:outline-none focus:ring-2 focus:ring-[${colors.accent}] transition`;
 
 const generatePassword = (existingPasswords, length = 10) => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
@@ -91,7 +103,6 @@ export default function SchoolDashboard() {
     if (activeTab === 'Students') {
       const existingPasswords = rowsData.Students.map(row => row[9]);
       const newPassword = generatePassword(existingPasswords);
-
       const newRow = [
         (rowsData.Students.length + 1).toString(),
         formData.fullName || '',
@@ -100,17 +111,15 @@ export default function SchoolDashboard() {
         formData.phone || '',
         formData.course || '',
         formData.duration || '',
-        '0', // Always 0 remaining months
+        '0',
         `STU${100 + rowsData.Students.length}`,
         newPassword,
       ];
-
       if (isEditing && editIndex !== null) {
         updatedRows.Students[editIndex] = newRow;
       } else {
         updatedRows.Students.push(newRow);
       }
-
     } else if (activeTab === 'Student Fees') {
       const newRow = [
         formData.school || '',
@@ -120,7 +129,6 @@ export default function SchoolDashboard() {
         formData.fee || '',
         formData.status || '',
       ];
-
       if (isEditing && editIndex !== null) {
         updatedRows['Student Fees'][editIndex] = newRow;
       } else {
@@ -201,18 +209,18 @@ export default function SchoolDashboard() {
 
     return (
       <div className="overflow-x-auto mt-6">
-        <table className="w-full table-auto border text-left text-sm text-[#0F172A]">
-          <thead className="bg-[#E2E8F0] text-[#0F172A]">
+        <table className="w-full table-auto border text-sm" style={{ color: colors.text }}>
+          <thead style={{ backgroundColor: colors.border }}>
             <tr>
               {headers.map((header, idx) => (
-                <th key={idx} className="px-4 py-2 border">{header}</th>
+                <th key={idx} className="px-4 py-2 border" style={{ borderColor: colors.border }}>{header}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={headers.length} className="px-4 py-4 border text-center text-gray-500">
+                <td colSpan={headers.length} className="px-4 py-4 border text-center" style={{ borderColor: colors.border, color: colors.textSecondary }}>
                   No Data
                 </td>
               </tr>
@@ -220,10 +228,10 @@ export default function SchoolDashboard() {
               rows.map((row, rowIndex) => (
                 <tr key={rowIndex} className="hover:bg-[#F1F5F9]">
                   {row.map((cell, cellIndex) => (
-                    <td key={cellIndex} className="px-4 py-2 border">{cell}</td>
+                    <td key={cellIndex} className="px-4 py-2 border" style={{ borderColor: colors.border }}>{cell}</td>
                   ))}
                   {(activeTab === 'Students' || activeTab === 'Student Fees') && (
-                    <td className="px-4 py-2 border flex gap-2">
+                    <td className="px-4 py-2 border flex gap-2" style={{ borderColor: colors.border }}>
                       <button className="text-blue-600 hover:text-blue-800" onClick={() => openEditModal(row, rowIndex)}>
                         <Pencil className="w-5 h-5" />
                       </button>
@@ -242,39 +250,47 @@ export default function SchoolDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#FFFFFF] text-[#0F172A] font-sans">
-      <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-[#E2E8F0] p-5 transition-transform transform md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:static md:block`}>
-        <div className="flex items-center justify-between mb-10 md:hidden">
-          <h2 className="text-xl font-bold">School Panel</h2>
-          <button onClick={() => setSidebarOpen(false)}>
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-        <h2 className="text-2xl font-bold mb-8 hidden md:block">School Panel</h2>
-        <nav className="space-y-3">
-          {menuItems.map((item, idx) => (
-            <button
-              key={idx}
-              className={`block w-full text-left py-2 px-4 rounded-lg transition ${activeTab === item.label ? 'bg-[#0EA5E9] text-white' : 'hover:bg-[#E2E8F0]'}`}
-              onClick={() => {
-                setActiveTab(item.label);
-                setModalOpen(false);
-                setSearchQuery('');
-              }}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
-      </div>
+    <div className="min-h-screen flex font-sans" style={{ backgroundColor: colors.background, color: colors.text }}>
+      {/* Sidebar */}
+     <div
+  className={`fixed inset-y-0 left-0 z-30 w-64 bg-[#1e293b] border-r p-5 transition-transform transform md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:static md:block text-white`}
+  style={{ borderColor: colors.border }}
+>
+  <div className="flex items-center justify-between mb-10 md:hidden">
+    <h2 className="text-xl font-bold">School Panel</h2>
+    <button onClick={() => setSidebarOpen(false)}>
+      <X className="w-6 h-6 text-white" />
+    </button>
+  </div>
+  <h2 className="text-2xl font-bold mb-8 hidden md:block">School Panel</h2>
+  <nav className="space-y-3">
+    {menuItems.map((item, idx) => (
+      <button
+        key={idx}
+        className={`block w-full text-left py-2 px-4 rounded-lg transition ${
+          activeTab === item.label ? 'bg-[#0EA5E9]' : 'hover:bg-[#334155]'
+        }`}
+        onClick={() => {
+          setActiveTab(item.label);
+          setModalOpen(false);
+          setSearchQuery('');
+        }}
+      >
+        {item.label}
+      </button>
+    ))}
+  </nav>
+</div>
+
 
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-20 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
+      {/* Content */}
       <div className="flex-1 flex flex-col">
-        <div className="w-full px-6 py-4 border-b border-[#E2E8F0] bg-white flex items-center justify-between">
-          <button className="text-[#0F172A] md:hidden" onClick={() => setSidebarOpen(true)}>
+        <div className="w-full px-6 py-4 border-b flex items-center justify-between" style={{ backgroundColor: colors.container, borderColor: colors.border }}>
+          <button className="md:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="w-6 h-6" />
           </button>
           <h1 className="text-xl font-semibold hidden md:block">Welcome, Sunrise School</h1>
@@ -282,19 +298,17 @@ export default function SchoolDashboard() {
 
         <div className="flex-1 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">
-              Manage all {activeTab.toLowerCase()} from here.
-            </h2>
+            <h2 className="text-xl font-semibold">Manage all {activeTab.toLowerCase()} from here.</h2>
             {(activeTab === 'Students' || activeTab === 'Student Fees') && (
-              <button className="flex items-center gap-2 px-4 py-2 bg-[#0EA5E9] text-white rounded hover:bg-[#0284C7]" onClick={openModal}>
+              <button className="flex items-center gap-2 px-4 py-2 rounded text-white" style={{ backgroundColor: colors.accent }} onClick={openModal}>
                 <Plus className="w-4 h-4" /> Add {activeTab === 'Student Fees' ? 'Student Fee' : 'Student'}
               </button>
             )}
           </div>
 
           {(activeTab === 'Students' || activeTab === 'School Payouts') && (
-            <div className="mb-4 p-4 bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg text-lg font-medium">
-              Commission: <span className="text-[#0EA5E9] font-semibold">{calculateCommission()}</span>
+            <div className="mb-4 p-4 rounded-lg text-lg font-medium" style={{ backgroundColor: colors.background, border: `1px solid ${colors.border}` }}>
+              Commission: <span className="font-semibold text-[#0EA5E9]">{calculateCommission()}</span>
             </div>
           )}
 
@@ -304,7 +318,8 @@ export default function SchoolDashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search..."
-              className="px-4 py-2 border border-gray-300 rounded-md w-full"
+              className="px-4 py-2 border rounded-md w-full"
+              style={{ borderColor: colors.border }}
             />
           </div>
 
@@ -312,8 +327,9 @@ export default function SchoolDashboard() {
         </div>
       </div>
 
+      {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold">
@@ -325,7 +341,7 @@ export default function SchoolDashboard() {
             </div>
             <form className="space-y-4" onSubmit={handleSubmit}>
               {renderFormFields()}
-              <button type="submit" className="w-full bg-[#0EA5E9] text-white py-2 rounded hover:bg-[#0284C7]">
+              <button type="submit" className="w-full py-2 rounded text-white" style={{ backgroundColor: colors.accent }}>
                 {isEditing ? 'Update' : 'Submit'}
               </button>
             </form>

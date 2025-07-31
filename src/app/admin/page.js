@@ -58,16 +58,13 @@ export default function AdminDashboard() {
 
     if (!edit) {
       if (headers.includes('ID')) initialForm['ID'] = (dataRows[activeTab].length + 1).toString();
-
       if (headers.includes('Log In ID')) {
         const prefix = activeTab === 'Schools' ? 'SCH' : activeTab === 'Students' ? 'STU' : 'USR';
         initialForm['Log In ID'] = `${prefix}${Math.floor(100 + Math.random() * 900)}`;
       }
-
       if (headers.includes('Password')) initialForm['Password'] = generateRandomPassword();
       if (headers.includes('Total Students')) initialForm['Total Students'] = '0';
       if (headers.includes('Commission')) initialForm['Commission'] = '0';
-
       if (activeTab === 'Students' && headers.includes('Remaining Months')) {
         initialForm['Remaining Months'] = '0';
       }
@@ -154,7 +151,7 @@ export default function AdminDashboard() {
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={headers.length} className="px-4 py-4 text-center border text-gray-400 italic">
+                <td colSpan={headers.length} className="px-4 py-4 text-center border text-[#64748B] italic">
                   No Data
                 </td>
               </tr>
@@ -164,11 +161,11 @@ export default function AdminDashboard() {
                   <td key={cellIndex} className="px-4 py-2 border">{cell}</td>
                 ))}
                 <td className="px-4 py-2 border flex gap-2">
-                  <button className="text-red-600 hover:text-red-800" onClick={() => handleDelete(rowIndex)}>
+                  <button className="text-[#DC2626] hover:text-red-800" onClick={() => handleDelete(rowIndex)}>
                     <Trash2 className="w-5 h-5" />
                   </button>
                   {activeTab !== 'Students' && (
-                    <button className="text-blue-600 hover:text-blue-800" onClick={() => openModal(true, rowIndex, row)}>
+                    <button className="text-[#0EA5E9] hover:text-[#0284C7]" onClick={() => openModal(true, rowIndex, row)}>
                       <Pencil className="w-5 h-5" />
                     </button>
                   )}
@@ -182,9 +179,9 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#FFFFFF] text-[#0F172A] font-sans">
+    <div className="min-h-screen flex bg-[#F1F5F9] text-[#0F172A] font-sans">
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-[#E2E8F0] p-5 transition-transform transform md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:static md:block`}>
+      <div className={`fixed inset-y-0 left-0 z-30 w-64 bg-[#1E293B] text-white border-r border-[#E2E8F0] p-5 transition-transform transform md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:static md:block`}>
         <div className="flex items-center justify-between mb-10 md:hidden">
           <h2 className="text-xl font-bold">Admin Panel</h2>
           <button onClick={() => setSidebarOpen(false)}>
@@ -196,7 +193,7 @@ export default function AdminDashboard() {
           {menuItems.map((item, idx) => (
             <button
               key={idx}
-              className={`block w-full text-left py-2 px-4 rounded-lg transition ${activeTab === item.label ? 'bg-[#0EA5E9] text-white' : 'hover:bg-[#E2E8F0]'}`}
+              className={`block w-full text-left py-2 px-4 rounded-lg transition ${activeTab === item.label ? 'bg-[#0EA5E9] text-white' : 'hover:bg-[#334155]'}`}
               onClick={() => {
                 setActiveTab(item.label);
                 setModalOpen(false);
@@ -244,7 +241,7 @@ export default function AdminDashboard() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search..."
-            className="mb-4 px-4 py-2 border border-gray-300 rounded-md w-full"
+            className="mb-4 px-4 py-2 border border-[#E2E8F0] bg-white rounded-md w-full text-[#0F172A]"
           />
 
           {renderTable()}
